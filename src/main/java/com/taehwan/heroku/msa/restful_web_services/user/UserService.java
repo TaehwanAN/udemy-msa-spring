@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -25,17 +26,23 @@ public class UserService {
     return userList;
   }
 
-  public User readUser(UUID userId){
+  public Optional<User> readUser(UUID userId){
     User resUser = null;
-//    for(User user: userList){
-//      if (user.getId().equals(userId)){
-//        resUser = user;
-//        break;
-//      }
-//    }
     Predicate<? super User> predicate = user -> user.getId().equals(userId);
-    return userList.stream().filter(predicate).findFirst().get();
+    return userList.stream().filter(predicate).findAny();
   }
-
-
+  
+  
+  public User createUser(User user) {
+    user.setId(UUID.randomUUID());
+    userList.add(user);
+    return user;
+  }
+  
+  public Optional<User> deleteUser(UUID userId) {
+    Predicate<? super User> predicate = user -> user.getId().equals(userId);
+    Optional<User> deleteUser = userList.stream().filter(predicate).findAny();
+    userList.removeIf(predicate);
+    return deleteUser;
+  }
 }
